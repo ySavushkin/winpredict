@@ -1,0 +1,25 @@
+Bane имеет 55.00% винрейта против Juggernaut
+Bane имеет 57.69% винрейта против Mirana
+Bane имеет 51.06% винрейта против Earthshaker
+Bane имеет 54.65% винрейта против Shadow Fiend
+Bane имеет 55.56% винрейта против Phantom Lancer
+Anti-Mage имеет 38.46% винрейта против Juggernaut
+Anti-Mage имеет 45.95% винрейта против Mirana
+Anti-Mage имеет 52.78% винрейта против Earthshaker
+Anti-Mage имеет 43.33% винрейта против Shadow Fiend
+Anti-Mage имеет 100.00% винрейта против Phantom Lancer
+Axe имеет 54.08% винрейта против Juggernaut
+Axe имеет 40.19% винрейта против Mirana
+Axe имеет 50.69% винрейта против Earthshaker
+Axe имеет 48.36% винрейта против Shadow Fiend
+Axe имеет 44.44% винрейта против Phantom Lancer
+Crystal Maiden имеет 51.64% винрейта против Juggernaut
+Crystal Maiden имеет 49.83% винрейта против Mirana
+Crystal Maiden имеет 47.57% винрейта против Earthshaker
+Crystal Maiden имеет 46.00% винрейта против Shadow Fiend
+Crystal Maiden имеет 72.41% винрейта против Phantom Lancer
+Drow Ranger имеет 45.00% винрейта против Juggernaut
+Drow Ranger имеет 42.50% винрейта против Mirana
+Drow Ranger имеет 54.72% винрейта против Earthshaker
+Drow Ranger имеет 49.48% винрейта против Shadow Fiend
+Drow Ranger имеет 69.23% винрейта против Phantom Lancer
