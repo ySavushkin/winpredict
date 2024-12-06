@@ -7,6 +7,7 @@ class PredictWinFuncs:
     def __init__(self, root, ui):
         self.root = root
         self.ui = ui
+        self.base_url = "https://api.opendota.com/api"
         self.heroes = self.fetch_heroes()
         self.selected_heroes = {'light': [], 'dark': []}
         self.selected_hero_ids = {'light': [], 'dark': []}
