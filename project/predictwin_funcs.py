@@ -123,33 +123,36 @@ class PredictWinFuncs:
 
         enemy_team = 'dark' if self.selected_team == 'light' else 'light'
 
+        # Сохраним список идентификаторов героев вражеской команды для удобства фильтрации
+        enemy_hero_ids = self.selected_hero_ids[enemy_team]
+
         for light_hero_id in self.selected_hero_ids[self.selected_team]:
-            for enemy_hero_id in self.selected_hero_ids[enemy_team]:
-                try:
-                    response = requests.get(f"https://api.opendota.com/api/heroes/{light_hero_id}/matchups")
-                    response.raise_for_status()
-                    matchups_data = response.json()
+            try:
+                # Один запрос для всех матчапов текущего героя
+                response = requests.get(f"https://api.opendota.com/api/heroes/{light_hero_id}/matchups")
+                print(f"https://api.opendota.com/api/heroes/{light_hero_id}/matchups")
+                response.raise_for_status()
+                matchups_data = response.json()
 
-                    win_rate = None
-                    for matchup in matchups_data:
-                        if matchup["hero_id"] == enemy_hero_id:
-                            win_rate = matchup["wins"] / matchup["games_played"] * 100
-                            break
+                for enemy_hero_id in enemy_hero_ids:
+                    # Ищем информацию о матчапе с конкретным вражеским героем
+                    matchup = next((m for m in matchups_data if m["hero_id"] == enemy_hero_id), None)
+                    if matchup:
+                        win_rate = matchup["wins"] / matchup["games_played"] * 100
 
-                    if win_rate is not None:
+                        # Получаем имена героев
                         light_hero_name = list(self.heroes.keys())[list(self.heroes.values()).index(light_hero_id)]
                         enemy_hero_name = list(self.heroes.keys())[list(self.heroes.values()).index(enemy_hero_id)]
+
                         text = f"{light_hero_name} имеет {win_rate:.2f}% винрейта против {enemy_hero_name}"
                         win_rate_texts.append(text)
 
                         # Подсчитываем общую вероятность победы
                         if win_rate >= 50:
                             overall_light_score += 1
-                        else:
-                            overall_light_score += 0
 
-                except requests.RequestException as e:
-                    print(f"Ошибка при запросе для героев {light_hero_id} против {enemy_hero_id}: {e}")
+            except requests.RequestException as e:
+                print(f"Ошибка при запросе для героя {light_hero_id}: {e}")
 
         self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
@@ -158,10 +161,11 @@ class PredictWinFuncs:
             self.results_text.insert(tk.END, f"{text}\n")
 
         # Вычисляем общую вероятность победы для команды 'light'
-        total_matchups = len(self.selected_hero_ids[self.selected_team]) * len(self.selected_hero_ids[enemy_team])
+        total_matchups = len(self.selected_hero_ids[self.selected_team]) * len(enemy_hero_ids)
         overall_probability_light = (overall_light_score / total_matchups) * 100
         self.results_text.insert(tk.END,
                                  f"\nОбщая вероятность победы: {overall_probability_light:.2f}%")
         self.results_text.config(state=tk.DISABLED)
+
 
 

@@ -1,5 +1,5 @@
 import tkinter as tk
-from project.predictwin_funcs import PredictWinFuncs
+from predictwin_funcs import PredictWinFuncs
 
 
 class AppUI:
