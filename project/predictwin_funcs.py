@@ -2,6 +2,7 @@ import requests
 import tkinter as tk
 from tkinter import ttk
 import csv
+import random
 
 
 class PredictWinFuncs:
@@ -249,8 +250,33 @@ class PredictWinFuncs:
                 except requests.exceptions.RequestException as e:
                     print(f"Помилка запиту даних для героя {light_hero_id}: {e}")
 
+
+
         self.results_text.insert(tk.END, "\nДеталізовані результати мідгейму:\n")
         self.results_text.insert(tk.END, "\n".join(midgame_detailed_results) + "\n\n")
+        self.results_text.insert(tk.END, "\nРезультати лейту:\n")
+
+        error_chance = 0.2
+
+        if random.random() < error_chance:
+            light_penalty = total_light_midgame * 0.1
+            total_light_midgame -= light_penalty
+            total_dark_midgame += light_penalty
+            self.results_text.insert(tk.END, f"Сили Світла зробили помилку! Віддають 10% шансів Силам Темряви.\n")
+
+        if random.random() < error_chance:
+            dark_penalty = total_dark_midgame * 0.1
+            total_dark_midgame -= dark_penalty
+            total_light_midgame += dark_penalty
+            self.results_text.insert(tk.END, f"Сили Темряви зробили помилку! Віддають 10% шансів Силам Світла.\n")
+
+        if total_light_midgame > total_dark_midgame:
+            self.results_text.insert(tk.END,
+                                     f"Сили Світла мають більше шансів на перемогу у лейті ({total_light_midgame:.2f}%).\n")
+        else:
+            self.results_text.insert(tk.END,
+                                     f"Сили Темряви мають більше шансів на перемогу у лейті ({total_dark_midgame:.2f}%).\n")
+
         self.results_text.config(state=tk.DISABLED)
 
     def adjusted_win_probability(self, base_win_rate, light_role_factor, dark_role_factor):
