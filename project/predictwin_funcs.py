@@ -135,7 +135,7 @@ class PredictWinFuncs:
             return
 
         results = {
-            "Легкая линия": {"light": 0, "dark": 0},
+            "Легка лінія": {"light": 0, "dark": 0},
             "Середня лінія": {"light": 0, "dark": 0},
             "Складна лінія": {"light": 0, "dark": 0}
         }
@@ -157,14 +157,13 @@ class PredictWinFuncs:
         }
 
         line_matchups = {
-            "Легкая линия": [("Carry", "Offlane"), ("Carry", "Support"), ("Hard Support", "Offlane"),
-                             ("Hard Support", "Support")],
+            "Легка лінія": [("Carry", "Offlane"), ("Carry", "Support"), ("Hard Support", "Offlane"), ("Hard Support", "Support")],
             "Середня лінія": [("Mid", "Mid")],
-            "Складна лінія": [("Offlane", "Carry"), ("Offlane", "Hard Support"), ("Support", "Carry"),
-                              ("Support", "Hard Support")]
+            "Складна лінія": [("Offlane", "Carry"), ("Offlane", "Hard Support"), ("Support", "Carry"), ("Support", "Hard Support")]
         }
 
         detailed_results = []
+        midgame_results = {"light": 0, "dark": 0}
 
         for line, matchups in line_matchups.items():
             for light_role, dark_role in matchups:
@@ -186,16 +185,18 @@ class PredictWinFuncs:
                         light_role_factor = self.hero_roles[light_hero_name][light_role]
                         dark_role_factor = self.hero_roles[dark_hero_name][dark_role]
 
-                        adjusted_win_rate = self.adjusted_win_probability(win_rate / 100, light_role_factor,
-                                                                          dark_role_factor)
+                        adjusted_win_rate = self.adjusted_win_probability(win_rate / 100, light_role_factor, dark_role_factor)
 
-                        detailed_results.append(
-                            f"{light_hero_name} ({light_role}) має {adjusted_win_rate * 100:.2f}% ймовірності перемоги проти {dark_hero_name} ({dark_role})\n")
+                        detailed_results.append(f"{light_hero_name} ({light_role}) має {adjusted_win_rate * 100:.2f}% ймовірності перемоги проти {dark_hero_name} ({dark_role})\n")
 
                         if adjusted_win_rate > 0.5:
                             results[line]["light"] += adjusted_win_rate
                         else:
                             results[line]["dark"] += (1 - adjusted_win_rate)
+
+                        # Midgame contribution
+                        midgame_results["light"] += adjusted_win_rate
+                        midgame_results["dark"] += (1 - adjusted_win_rate)
 
                 except requests.exceptions.RequestException as e:
                     print(f"Помилка запиту даних для героя {light_hero_id}: {e}")
@@ -210,14 +211,47 @@ class PredictWinFuncs:
             dark_score = scores["dark"] / len(line_matchups[line]) * 100
 
             if light_score > dark_score:
-                self.results_text.insert(tk.END,
-                                         f"{line} Сили Світла має більше шансів на перемогу ({light_score:.2f}%).\n")
+                self.results_text.insert(tk.END, f"{line} Сили Світла має більше шансів на перемогу на лайнінгу ({light_score:.2f}%).\n")
             else:
-                self.results_text.insert(tk.END,
-                                         f"{line} Сили Темряви має більше шансів на перемогу ({dark_score:.2f}%).\n")
+                self.results_text.insert(tk.END, f"{line} Сили Темряви має більше шансів на перемогу на лайнінгу ({dark_score:.2f}%).\n")
 
+        # Midgame results
+        total_light_midgame = midgame_results["light"] / sum(len(v) for v in line_matchups.values()) * 100
+        total_dark_midgame = midgame_results["dark"] / sum(len(v) for v in line_matchups.values()) * 100
+
+        self.results_text.insert(tk.END, "\nРезультати мідгейму:\n")
+        if total_light_midgame > total_dark_midgame:
+            self.results_text.insert(tk.END, f"Сили Світла мають більше шансів на перемогу у мідгеймі ({total_light_midgame:.2f}%).\n")
+        else:
+            self.results_text.insert(tk.END, f"Сили Темряви мають більше шансів на перемогу у мідгеймі ({total_dark_midgame:.2f}%).\n")
+
+        # Midgame detailed results
+        midgame_detailed_results = []
+
+        for light_hero_name in light_roles.values():
+            for dark_hero_name in dark_roles.values():
+                light_hero_id = self.heroes[light_hero_name]
+                dark_hero_id = self.heroes[dark_hero_name]
+
+                try:
+                    response = requests.get(f"https://api.opendota.com/api/heroes/{light_hero_id}/matchups")
+                    response.raise_for_status()
+                    matchups_data = response.json()
+
+                    matchup = next((m for m in matchups_data if m["hero_id"] == dark_hero_id), None)
+                    if matchup:
+                        win_rate = matchup["wins"] / matchup["games_played"] * 100
+
+                        midgame_detailed_results.append(
+                            f"{light_hero_name} має {win_rate:.2f}% ймовірності перемоги проти {dark_hero_name}\n"
+                        )
+
+                except requests.exceptions.RequestException as e:
+                    print(f"Помилка запиту даних для героя {light_hero_id}: {e}")
+
+        self.results_text.insert(tk.END, "\nДеталізовані результати мідгейму:\n")
+        self.results_text.insert(tk.END, "\n".join(midgame_detailed_results) + "\n\n")
         self.results_text.config(state=tk.DISABLED)
 
     def adjusted_win_probability(self, base_win_rate, light_role_factor, dark_role_factor):
-        return base_win_rate * light_role_factor / (
-                    base_win_rate * light_role_factor + (1 - base_win_rate) * dark_role_factor)
+        return base_win_rate * light_role_factor / (base_win_rate * light_role_factor + (1 - base_win_rate) * dark_role_factor)
