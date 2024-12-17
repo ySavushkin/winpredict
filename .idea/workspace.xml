@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d656e4b-f24f-4356-a5c3-fc2f12fb9df5" name="Changes" comment="лан вроде норм, осталось сделать короче скажи джипитишнику типа у меня есть рассчеті мидгейма и ранней игрі и типа добавь цену ошибки и введи рандомній шанс на ошибку и еще раз пересчитай матчапі и шанс на победу в поздней игре с учетом также и цені ошибки потомучто у меня новій гпт кончился">
+    <list default="true" id="7d656e4b-f24f-4356-a5c3-fc2f12fb9df5" name="Changes" comment="доработаная яйка">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project/predictwin_funcs.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/predictwin_funcs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/predictwin_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/predictwin_ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +131,23 @@
       <option name="project" value="LOCAL" />
       <updated>1734323179586</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="доработаная яйка">
+      <option name="closed" value="true" />
+      <created>1734395843694</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1734395843694</updated>
+    </task>
+    <task id="LOCAL-00006" summary="доработаная яйка">
+      <option name="closed" value="true" />
+      <created>1734395866351</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1734395866351</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -149,6 +165,7 @@
     <MESSAGE value="1" />
     <MESSAGE value="сделай короче чтоб результат по лайнам считало норм а то героев норм а потом &quot;Силы тьмы победили с какимто рандомным процентом&quot;" />
     <MESSAGE value="лан вроде норм, осталось сделать короче скажи джипитишнику типа у меня есть рассчеті мидгейма и ранней игрі и типа добавь цену ошибки и введи рандомній шанс на ошибку и еще раз пересчитай матчапі и шанс на победу в поздней игре с учетом также и цені ошибки потомучто у меня новій гпт кончился" />
-    <option name="LAST_COMMIT_MESSAGE" value="лан вроде норм, осталось сделать короче скажи джипитишнику типа у меня есть рассчеті мидгейма и ранней игрі и типа добавь цену ошибки и введи рандомній шанс на ошибку и еще раз пересчитай матчапі и шанс на победу в поздней игре с учетом также и цені ошибки потомучто у меня новій гпт кончился" />
+    <MESSAGE value="доработаная яйка" />
+    <option name="LAST_COMMIT_MESSAGE" value="доработаная яйка" />
   </component>
 </project>

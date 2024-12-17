@@ -59,6 +59,7 @@ class PredictWinFuncs:
         self.hero_window = tk.Toplevel(self.root)
         self.hero_window.title("Вибір героїв")
 
+
         window_width = 1400
         window_height = 880
 
@@ -69,7 +70,7 @@ class PredictWinFuncs:
         y_position = (screen_height // 15)
 
         self.hero_window.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
-
+        self.hero_window.configure(bg="#212121")
         # Размещаем миникарту в отдельном столбце
         self.minimap_canvas = tk.Canvas(self.hero_window, width=400, height=400)
         self.minimap_canvas.grid(row=0, column=0, rowspan=8, padx=10, pady=10, sticky="ns")
@@ -82,40 +83,68 @@ class PredictWinFuncs:
         else:
             print(f"Миникарта не найдена по пути: {minimap_path}")
 
+        default_font = ('Arial', 12)
         # Команда для Світла (Light)
-        tk.Label(self.hero_window, text="Сила Світла").grid(row=0, column=1, padx=10, pady=5)
+        tk.Label(self.hero_window, text="Сила Світла", font=default_font, fg="#E0E0E0", bg="#1e1e1e").grid(row=0,
+                                                                                                           column=1,
+                                                                                                           padx=10,
+                                                                                                           pady=5)
         self.light_team_inputs = []
         self.create_team_inputs('light', 1)
 
         # Команда для Темряви (Dark)
-        tk.Label(self.hero_window, text="Сила Темряви").grid(row=0, column=2, padx=10, pady=5)
+        tk.Label(self.hero_window, text="Сила Темряви", font=default_font, fg="#E0E0E0", bg="#1e1e1e").grid(row=0,
+                                                                                                            column=2,
+                                                                                                            padx=10,
+                                                                                                            pady=5)
         self.dark_team_inputs = []
         self.create_team_inputs('dark', 2)
 
         button_row = 7
-        self.calculate_button = tk.Button(self.hero_window, text="Розрахувати ймовірність перемоги",
-                                          command=self.calculate_win_rates)
+        self.calculate_button = tk.Button(
+            self.hero_window,
+            text="Розрахувати ймовірність перемоги",
+            font=default_font,
+            bg="#2E3440",
+            fg="#E0E0E0",
+            command=self.calculate_win_rates
+        )
         self.calculate_button.grid(row=button_row, column=1, columnspan=2, pady=20)
 
-        self.results_text = tk.Text(self.hero_window, width=80, height=20)
+        self.results_text = tk.Text(self.hero_window, width=80, height=20, font=default_font, bg="#2E2E2E",
+                                    fg="#E0E0E0")
         self.results_text.grid(row=button_row + 1, column=1, columnspan=2, padx=10, pady=10)
         self.results_text.config(state=tk.DISABLED)
 
     def create_team_inputs(self, team, column):
         for i in range(5):
-            frame = tk.Frame(self.hero_window)
+            frame = tk.Frame(self.hero_window, bg="#37474F")
             frame.grid(row=i + 2, column=column, padx=10, pady=5)
 
-            entry = ttk.Entry(frame, width=20)
-            entry.pack(side=tk.LEFT)
+            # Ввод имени героя - светло-серый фон
+            entry = tk.Entry(frame, width=20, font=('Arial', 12), bg="#2E3440", fg="white")
+            entry.pack(side=tk.LEFT, padx=5)
+            entry_style = ttk.Style()
+            entry_style.configure("TEntry", fieldbackground="#B0BEC5")
 
+            style = ttk.Style()
+            style.theme_use('clam')
+            style.configure('TCombobox', fieldbackground="#2E3440", background="#2E3440", foreground="#2E3440")
+
+            # Комбобокс для выбора роли - светло-серый фон
             role_combobox = ttk.Combobox(frame, values=["Carry", "Mid", "Offlane", "Support", "Hard Support"], width=15)
             role_combobox.set("Carry")
             role_combobox.pack(side=tk.LEFT, padx=(5, 0))
 
-            suggestions = tk.Listbox(frame, width=30, height=3)
+            combobox_style = ttk.Style()
+            combobox_style.configure("TCombobox", fieldbackground="#B0BEC5")
+
+            suggestions = tk.Listbox(frame, height=3, bg="#2E2E2E", fg="#E0E0E0")
             suggestions.pack(side=tk.LEFT, padx=(5, 0))
-            suggestions.bind("<<ListboxSelect>>", lambda event, e=entry, s=suggestions, t=team, r=role_combobox: self.on_hero_select(event, e, s, t, r))
+            suggestions.bind("<<ListboxSelect>>",
+                             lambda event, e=entry, s=suggestions, t=team, r=role_combobox: self.on_hero_select(event,
+                                                                                                                e, s, t,
+                                                                                                                r))
             suggestions.pack_forget()
 
             entry.bind("<KeyRelease>", lambda event, e=entry, s=suggestions: self.update_suggestions(e, s))
