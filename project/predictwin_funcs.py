@@ -54,6 +54,7 @@ class PredictWinFuncs:
                 }
         return hero_roles
 
+
     def create_hero_selection_window(self):
         self.hero_window = tk.Toplevel(self.root)
         self.hero_window.title("Вибір героїв")
