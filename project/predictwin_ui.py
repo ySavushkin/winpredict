@@ -21,6 +21,8 @@ class AppUI:
         # Начальное окно для выбора команды
         self.show_team_selection_window()
 
+
+
     def show_team_selection_window(self):
         window_width = 300
         window_height = 300

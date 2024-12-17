@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import ttk
 import csv
 import random
+from PIL import Image, ImageTk
+import os
 
 
 class PredictWinFuncs:
@@ -15,6 +17,22 @@ class PredictWinFuncs:
         self.selected_roles = {'light': [], 'dark': []}
         self.selected_team = None
         self.hero_roles = self.load_hero_roles()
+        self.minimap_canvas = None
+        self.minimap_image = None
+        self.hero_icons = {}  # Для хранения загруженных иконок героев
+        self.minimap_positions = {
+            'light_carry': (300, 335),  # Нижняя линия, carry
+            'light_hard_support': (270, 335),  # Нижняя линия, hard support
+            'light_mid': (170, 230),  # Центр, mid
+            'light_offlane': (67, 140),  # Верхняя линия, offlane
+            'light_support': (67, 175),  # Верхняя линия, support
+
+            'dark_carry': (100, 75),  # Верхняя линия, carry
+            'dark_hard_support': (135, 75),  # Верхняя линия, hard support
+            'dark_mid': (210, 180),  # Центр, mid
+            'dark_offlane': (330, 270),  # Нижняя линия, offlane
+            'dark_support': (330, 235)  # Нижняя линия, support
+        }
 
     def fetch_heroes(self):
         response = requests.get("https://api.opendota.com/api/heroes")
@@ -40,32 +58,46 @@ class PredictWinFuncs:
         self.hero_window = tk.Toplevel(self.root)
         self.hero_window.title("Вибір героїв")
 
-        window_width = 630
-        window_height = 800
+        window_width = 1400
+        window_height = 880
 
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
 
         x_position = (screen_width // 2) - (window_width // 2)
-        y_position = (screen_height // 2) - (window_height // 2)
+        y_position = (screen_height // 15)
 
         self.hero_window.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
-        tk.Label(self.hero_window, text="Сила Світла").grid(row=0, column=0, padx=10, pady=5)
-        self.light_team_inputs = []
-        self.create_team_inputs('light', 0)
+        # Размещаем миникарту в отдельном столбце
+        self.minimap_canvas = tk.Canvas(self.hero_window, width=400, height=400)
+        self.minimap_canvas.grid(row=0, column=0, rowspan=8, padx=10, pady=10, sticky="ns")
 
-        tk.Label(self.hero_window, text="Сила Темряви").grid(row=0, column=1, padx=10, pady=5)
+        # Загрузка миникарты
+        minimap_path = "minimap.jpg"
+        if os.path.exists(minimap_path):
+            self.minimap_image = ImageTk.PhotoImage(Image.open(minimap_path).resize((400, 400)))
+            self.minimap_canvas.create_image(0, 0, anchor=tk.NW, image=self.minimap_image)
+        else:
+            print(f"Миникарта не найдена по пути: {minimap_path}")
+
+        # Команда для Світла (Light)
+        tk.Label(self.hero_window, text="Сила Світла").grid(row=0, column=1, padx=10, pady=5)
+        self.light_team_inputs = []
+        self.create_team_inputs('light', 1)
+
+        # Команда для Темряви (Dark)
+        tk.Label(self.hero_window, text="Сила Темряви").grid(row=0, column=2, padx=10, pady=5)
         self.dark_team_inputs = []
-        self.create_team_inputs('dark', 1)
+        self.create_team_inputs('dark', 2)
 
         button_row = 7
         self.calculate_button = tk.Button(self.hero_window, text="Розрахувати ймовірність перемоги",
                                           command=self.calculate_win_rates)
-        self.calculate_button.grid(row=button_row, column=0, columnspan=2, pady=20)
+        self.calculate_button.grid(row=button_row, column=1, columnspan=2, pady=20)
 
-        self.results_text = tk.Text(self.hero_window, width=60, height=23)
-        self.results_text.grid(row=button_row + 1, column=0, columnspan=2, padx=10, pady=10)
+        self.results_text = tk.Text(self.hero_window, width=80, height=20)
+        self.results_text.grid(row=button_row + 1, column=1, columnspan=2, padx=10, pady=10)
         self.results_text.config(state=tk.DISABLED)
 
     def create_team_inputs(self, team, column):
@@ -105,6 +137,34 @@ class PredictWinFuncs:
             if typed_text in hero_name.lower() and hero_name not in self.selected_heroes['light'] + self.selected_heroes['dark']:
                 suggestions.insert(tk.END, hero_name)
 
+    def display_hero_on_minimap(self, hero_name, role, team):
+        """
+        Отображение иконки героя на миникарте
+        """
+        icon_path = f"icons/{hero_name}.png"  # Путь к локальному файлу иконки героя
+
+        # Загрузка локальной иконки героя
+        if os.path.exists(icon_path):
+            hero_icon = ImageTk.PhotoImage(Image.open(icon_path).resize((32, 32)))
+        else:
+            # Альтернативный вариант: загрузка иконки через API
+            # api_icon_url = f"https://api.opendota.com/apps/dota2/images/heroes/{hero_name.lower().replace(' ', '_')}_icon.png"
+            # response = requests.get(api_icon_url, stream=True)
+            # if response.status_code == 200:
+            #     hero_icon = ImageTk.PhotoImage(Image.open(response.raw).resize((40, 40)))
+            # else:
+            print(f"Иконка героя не найдена локально: {icon_path}")
+            return
+
+        # Сохраняем иконку, чтобы она не удалилась сборщиком мусора
+        self.hero_icons[hero_name] = hero_icon
+
+        # Получение позиции на карте
+        position_key = f"{team}_{role.lower().replace(' ', '_')}"
+        if position_key in self.minimap_positions:
+            x, y = self.minimap_positions[position_key]
+            self.minimap_canvas.create_image(x, y, anchor=tk.CENTER, image=hero_icon)
+
     def on_hero_select(self, event, entry, suggestions, team, role_combobox):
         selection = suggestions.curselection()
         if not selection:
@@ -119,6 +179,11 @@ class PredictWinFuncs:
             self.selected_hero_ids[team].append(self.heroes[selected])
             selected_role = role_combobox.get()
             self.selected_roles[team].append((selected, selected_role))
+
+        # Отображение героя на карте
+        selected_hero = entry.get()
+        selected_role = role_combobox.get()
+        self.display_hero_on_minimap(selected_hero, selected_role, team)
 
         self.clear_other_suggestions()
 
