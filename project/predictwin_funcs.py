@@ -127,7 +127,6 @@ class PredictWinFuncs:
             entry_style = ttk.Style()
             entry_style.configure("TEntry", fieldbackground="#B0BEC5")
 
-
             style = ttk.Style()
             style.theme_use('clam')
             style.configure('TCombobox', fieldbackground="#2E3440", background="#2E3440", foreground="#2E3440")
