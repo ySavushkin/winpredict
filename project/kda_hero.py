@@ -73,11 +73,15 @@ def plot_kda_distribution(kdas, outcomes):
     plt.plot(x, pdf_loss_gamma, "b-", label="Гамма розподіл Поразки")
 
     def gamma_intersection_func(x_val):
-        return gamma.pdf(x_val, shape_win, loc=loc_win, scale=scale_win) - gamma.pdf(x_val, shape_loss, loc=loc_loss, scale=scale_loss)
+        return gamma.pdf(x_val, shape_win, loc=loc_win, scale=scale_win) - gamma.pdf(x_val, shape_loss, loc=loc_loss,
+                                                                                     scale=scale_loss)
 
-    gamma_intersection_point = brentq(gamma_intersection_func, min(x), max(x))
-
-    plt.axvline(gamma_intersection_point, color="orange", linestyle="--", label=f"Гамма поріг: {gamma_intersection_point:.2f}")
+    try:
+        gamma_intersection_point = brentq(gamma_intersection_func, min(x), max(x))
+        plt.axvline(gamma_intersection_point, color="orange", linestyle="--",
+                    label=f"Гамма поріг: {gamma_intersection_point:.2f}")
+    except ValueError as e:
+        print(f"Ошибка поиска точки пересечения гамма-распределений: {e}")
 
     plt.title("Розподіл KDA з нормальним та гамма розподілами")
     plt.xlabel("KDA")
